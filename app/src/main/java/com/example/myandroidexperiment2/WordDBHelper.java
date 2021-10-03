@@ -6,11 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class WordDBHelper extends SQLiteOpenHelper {
 
-    private final static String DATABASE_NAME = "WordsDatabase";
+    private final static String DATABASE_NAME = "WordsDatabase.db";
     private final static int DATABASE_VERSION = 1;
 
     private final static String SQL_CREATE_DATABASE =
-            "create table words ( id primary key, word TEXT, meaning TEXT, sample TEXT)";
+            "create table words ( id String primary key, word String, meaning String, sample String)";
 
     private final static String SQL_DELETE_TABLE =
     "DROP TABLE IF EXISTS words";

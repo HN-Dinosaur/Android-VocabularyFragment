@@ -1,6 +1,9 @@
 package com.example.myandroidexperiment2.Model;
 
-public class Word {
+
+import java.io.Serializable;
+
+public class Word implements Serializable {
     public String id;
     public String word;
     public String meaning;
@@ -45,5 +48,8 @@ public class Word {
 
     public void setSample(String sample) {
         this.sample = sample;
+    }
+    public String toString(){
+        return "id:" + id + "\nword:" + word + "\nmeaning: " + meaning + "\nsample: " + sample;
     }
 }

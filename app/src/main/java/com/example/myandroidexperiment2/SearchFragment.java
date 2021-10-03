@@ -12,10 +12,10 @@ import android.widget.TextView;
 import com.example.myandroidexperiment2.Model.Word;
 
 
-public class DetailFragment extends Fragment {
+public class SearchFragment extends Fragment {
 
 
-    MainActivity activity;
+    SearchResultActivity searchResultActivity;
     private TextView wordView;
     private TextView meaningView;
     private TextView sampleView;
@@ -30,8 +30,8 @@ public class DetailFragment extends Fragment {
 
 
 
-        activity = (MainActivity) getActivity();
-        activity.setOnChangeListener(new MainActivity.OnChangeListener()
+        searchResultActivity = (SearchResultActivity) getActivity();
+        searchResultActivity.setOnChangeListener(new MainActivity.OnChangeListener()
         {
             @Override
             public void changeText(Word word)

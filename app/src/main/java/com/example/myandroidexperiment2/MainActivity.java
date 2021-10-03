@@ -6,7 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -22,9 +27,11 @@ import android.widget.Toast;
 
 import com.example.myandroidexperiment2.Model.Word;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,33 +41,47 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
 
     Adapter adapter;
-    WordDBHelper mDbHelper;
+    static WordDBHelper mDbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        words = new ArrayList<>();
-        init();
+        //创建SQL HELP对象，第一次运行时数据库并没有被创建
+        mDbHelper = new WordDBHelper(this);
 
         //将数据库中的单词取出
-//        words = getAll();
+        words = getAll();
+//        //在列表显示所有单词
+//
+        setWordListView(words);
+//
+        //设置Detail布局
+        setWordDetailView();
+//
+        //设置列表点击响应
+        setListClick();
+//
+        //为ListView注册上下文菜单
+        registerForContextMenu(listView);
 
+    }
+    void setWordListView(List<Word> words){
+        wordNames = new ArrayList<>();
         for(int i = 0; i < words.size(); i++){
             wordNames.add(words.get(i).getWord());
         }
         listView = findViewById(R.id.listView);
         adapter = new Adapter(wordNames,this);
         listView.setAdapter(adapter);
-
+    }
+    void setWordDetailView(){
         DetailFragment detailFragment = new DetailFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, detailFragment);
         fragmentTransaction.commit();
-
-
-
+    }
+    void setListClick(){
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
             @Override
@@ -73,18 +94,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-
-        //为ListView注册上下文菜单
-        registerForContextMenu(listView);
-
-        //创建SQL HELP对象，第一次运行时数据库并没有被创建
-        mDbHelper = new WordDBHelper(this);
-
-        //在列表显示所有单词
-
-//        setWordListView(words);
-
     }
 
 
@@ -96,37 +105,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        TextView textId = null;
-        TextView textWord = null;
-        TextView textMeaning = null;
-        TextView textSample = null;
-
         AdapterView.AdapterContextMenuInfo info = null;
-        View itemView = null;
-
         switch (item.getItemId()){
             case R.id.delete:
-
                 info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-                deleteDialog(String.valueOf(info.position + 1));
+                deleteDialog(words.get(info.position).getId());
                 break;
             case R.id.modify:
-                Toast.makeText(MainActivity.this, "modify", Toast.LENGTH_SHORT).show();
-//                info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-//                itemView = info.targetView;
-//                textId = itemView.findViewById(R.id.textViewWord);
-//                textWord = itemView.findViewById(R.id.textViewWord);
-//                textMeaning = itemView.findViewById(R.id.textViewMeaning);
-//                textSample = itemView.findViewById(R.id.textViewSample);
-//
-//                if(textId != null && textWord != null && textMeaning != null && textSample != null){
-//                    String strId = textId.getText().toString();
-//                    String strWord = textWord.getText().toString();
-//                    String strMeaning = textSample.getText().toString();
-//                    String strSample = textSample.getText().toString();
-//                    UpdataDialog(strId, strWord, strMeaning, strSample);
-//                }
-
+                info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+                Word word = words.get(info.position);
+                updateDialog(word.getId(),word.getWord(), word.getMeaning(), word.getSample(), info.position);
                 break;
         }
         return true;
@@ -144,48 +132,33 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id){
             case R.id.search:
-                Toast.makeText(MainActivity.this, "search", Toast.LENGTH_SHORT).show();
-//                SerchDialog();
+                searchDialog();
                 break;
             case R.id.add:
-//                Toast.makeText(MainActivity.this, "add", Toast.LENGTH_SHORT).show();
                 insertDialog();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mDbHelper.close();
-    }
-
-
-    void init(){
-
-        Word word;
-        word = new Word("1","apple","苹果","This is a apple");
-        words.add(word);
-        word = new Word("2","pear","梨","This is a pear");
-        words.add(word);
-        word = new Word("3","banana","香蕉","This is a banana");
-        words.add(word);
-        word = new Word("4","watermelon","西瓜","This is a watermelon");
-        words.add(word);
-        word = new Word("5","lemon","柠檬","This is a lemon");
-        words.add(word);
-    }
     //得到数据库内的所有数据
     List<Word> getAll(){
-        return null;
+        String sql = "select * from words";
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        Cursor cursor = db.rawQuery(sql,new String[]{});
+        List<Word> insertWordList = new ArrayList<>();
+        Word insertWordClass;
+        while(cursor.moveToNext()) {
+            @SuppressLint("Range") String id = cursor.getString(cursor.getColumnIndex("id"));
+            @SuppressLint("Range") String word = cursor.getString(cursor.getColumnIndex("word"));
+            @SuppressLint("Range") String meaning = cursor.getString(cursor.getColumnIndex("meaning"));
+            @SuppressLint("Range") String sample = cursor.getString(cursor.getColumnIndex("sample"));
+            insertWordClass = new Word(id, word, meaning, sample);
+            insertWordList.add(insertWordClass);
+        }
+        return insertWordList;
     }
-    void setOnChangeListener(OnChangeListener onChangeListener){
-        this.onChangeListener = onChangeListener;
-    }
-    interface OnChangeListener{
-        void changeText(Word word);
-    }
+
     //插入
     private void insertUserSql(String id, String word, String meaning, String sample){
         String sql = "insert into words(id, word, meaning, sample) values(?,?,?,?)";
@@ -201,17 +174,15 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String word = ((EditText)linearLayout.findViewById(R.id.insertWord)).getText().toString();
-                        String meaning = ((EditText)linearLayout.findViewById(R.id.insertMeaning)).getText().toString();
-                        String sample = ((EditText)linearLayout.findViewById(R.id.insertSample)).getText().toString();
+                        String insertWord = ((EditText)linearLayout.findViewById(R.id.insertWord)).getText().toString();
+                        String insertMeaning = ((EditText)linearLayout.findViewById(R.id.insertMeaning)).getText().toString();
+                        String insertSample = ((EditText)linearLayout.findViewById(R.id.insertSample)).getText().toString();
+                        String insertId = getTime();
+                        insertUserSql(insertId ,insertWord, insertMeaning, insertSample);
 
-
-                        Toast.makeText(MainActivity.this, word + meaning + sample, Toast.LENGTH_SHORT).show();
-//                        insertUserSql(String.valueOf(words.size() + 1) ,word, meaning, sample);
-
-//                        words = getAll();
+                        words = getAll();
                         //显示出来
-//                        setWordsListView(items);
+                        setWordListView(words);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -236,6 +207,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         delete(id);
+
+                        words = getAll();
+                        setWordListView(words);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -247,14 +221,123 @@ public class MainActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
-    private void update(String word, String meaning, String sample){
-        String sql = "update words set word=?,meaning=?,sample=?";
+    private void update(String id, String word, String meaning, String sample){
+        String sql = "update words set word=?,meaning=?,sample=? where id = ?";
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        db.execSQL(sql,new String[]{word, meaning, sample});
+        db.execSQL(sql,new String[]{word, meaning, sample, id});
     }
-    private void updateDialog(String word, String meaning, String sample){
+    private void updateDialog(String id, String word, String meaning, String sample, int position){
         final LinearLayout linearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.insert, null);
-//        String word = ((EditText) linearLayout.findViewById(R.id.insertWord)).getText().toString();
-//        String meaning = ((EditText) linearLayout.findViewById(R.id.insertMeaning)).getText().toString();
+        ((EditText) linearLayout.findViewById(R.id.insertWord)).setText(word);
+        ((EditText)linearLayout.findViewById(R.id.insertMeaning)).setText(meaning);
+        ((EditText)linearLayout.findViewById(R.id.insertSample)).setText(sample);
+        new AlertDialog.Builder(this)
+                .setTitle("修改单词")
+                .setView(linearLayout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String modifyWord = ((EditText) linearLayout.findViewById(R.id.insertWord)).getText().toString();
+                        String modifyMeaning = ((EditText) linearLayout.findViewById(R.id.insertMeaning)).getText().toString();
+                        String modifySample = ((EditText) linearLayout.findViewById(R.id.insertSample)).getText().toString();
+                        update(id, modifyWord, modifyMeaning, modifySample);
+
+                        //更新视图
+                        words = getAll();
+                        //改变左侧列表
+                        setWordListView(words);
+                        //改变右侧内容
+                        onChangeListener.changeText(words.get(i));
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
     }
+    private ArrayList<Word> search(String word){
+        String sql = "select * from words where word like ? order by word desc";
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        Cursor cursor =  db.rawQuery(sql, new String[]{"%" + word + "%"});
+        return convertCursorToList(cursor);
+    }
+
+
+    private ArrayList<Word> convertCursorToList(Cursor cursor){
+        ArrayList<Word> list = new ArrayList<>();
+        Word searchWordClass;
+        while(cursor.moveToNext()) {
+            @SuppressLint("Range") String id = cursor.getString(cursor.getColumnIndex("id"));
+            @SuppressLint("Range") String word = cursor.getString(cursor.getColumnIndex("word"));
+            @SuppressLint("Range") String meaning = cursor.getString(cursor.getColumnIndex("meaning"));
+            @SuppressLint("Range") String sample = cursor.getString(cursor.getColumnIndex("sample"));
+            searchWordClass = new Word(id, word, meaning, sample);
+            list.add(searchWordClass);
+        }
+        return list;
+    }
+
+    private void searchDialog(){
+        final LinearLayout linearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.search, null);
+        new AlertDialog.Builder(this)
+                .setTitle("搜索")
+                .setView(linearLayout)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String searchWord = ((EditText) linearLayout.findViewById(R.id.searchWord)).getText().toString();
+                        ArrayList<Word> results = search(searchWord);
+
+
+                        if(results.size() > 0){
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable("results", results);
+                            Intent intent = new Intent(MainActivity.this,SearchResultActivity.class);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+
+                        }else{
+                            Toast.makeText(MainActivity.this, "没有找到", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
+    }
+    String getTime(){
+        Date date = new Date();
+        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyyMMddhhmmss");
+        return dateFormat.format(date);
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        words = getAll();
+        setWordListView(words);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDbHelper.close();
+    }
+    void setOnChangeListener(OnChangeListener onChangeListener){
+        this.onChangeListener = onChangeListener;
+    }
+    interface OnChangeListener {
+        void changeText(Word word);
+    }
+
 }

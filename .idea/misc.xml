@@ -4,11 +4,15 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/activity_search_result.xml" value="0.2953125" />
         <entry key="app/src/main/res/layout/fragment_detail.xml" value="0.2907692307692308" />
         <entry key="app/src/main/res/layout/fragment_detail2.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_item.xml" value="0.2824074074074074" />
         <entry key="app/src/main/res/layout/fragment_item_list.xml" value="0.2824074074074074" />
         <entry key="app/src/main/res/layout/insert.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/item_style.xml" value="0.1578125" />
+        <entry key="app/src/main/res/layout/search.xml" value="0.335" />
+        <entry key="app/src/main/res/menu/back_to_main.xml" value="0.25" />
         <entry key="app/src/main/res/menu/contextmenu_wordslistview.xml" value="0.2657595473915863" />
         <entry key="app/src/main/res/menu/operate_vocabulary.xml" value="0.29892359507458155" />
       </map>
