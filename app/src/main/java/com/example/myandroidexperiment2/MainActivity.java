@@ -5,10 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,12 +19,10 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myandroidexperiment2.Model.Word;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -315,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
-    String getTime(){
+    static String getTime(){
         Date date = new Date();
         SimpleDateFormat dateFormat= new SimpleDateFormat("yyyyMMddhhmmss");
         return dateFormat.format(date);
