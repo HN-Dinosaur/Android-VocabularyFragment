@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.myandroidexperiment2.R;
+
 import java.util.List;
 
 public class Adapter extends BaseAdapter {

@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.example.myandroidexperiment2.Model.Word;
 
 
-public class MainActivity2 extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity {
 
     private static final String TAG="MyWordsTag";
     private ContentResolver resolver;
@@ -26,7 +26,7 @@ public class MainActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.TestActivity);
         mDbHelper = new WordDBHelper(this);
         resolver = this.getContentResolver();
 
@@ -43,7 +43,7 @@ public class MainActivity2 extends AppCompatActivity {
         to.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity2.this,MainActivity.class);
+                Intent intent = new Intent(TestActivity.this,MainActivity.class);
                 startActivity(intent);
             }
         });
@@ -54,7 +54,7 @@ public class MainActivity2 extends AppCompatActivity {
                 Cursor cursor = resolver.query(Word.CONTENT_URI,new String[]{
                         "id","word","meaning","sample"},null,null,null);
                 if(cursor == null){
-                    Toast.makeText(MainActivity2.this, "没有找到记录", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TestActivity.this, "没有找到记录", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -126,7 +126,7 @@ public class MainActivity2 extends AppCompatActivity {
                 Cursor cursor = resolver.query(uri,new String[]{
                         "id","word","meaning","sample"},null,null,null);
                 if(cursor == null){
-                    Toast.makeText(MainActivity2.this, "没有找到记录", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TestActivity.this, "没有找到记录", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 String msg = "";

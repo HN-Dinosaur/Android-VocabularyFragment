@@ -81,9 +81,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //添加选中的样式
                 adapter.setSelectedPosition(i);
                 adapter.notifyDataSetInvalidated();
-
+                //选中之后右侧发生变化
                 if(onChangeListener != null){
                     onChangeListener.changeText(words.get(i));
                 }

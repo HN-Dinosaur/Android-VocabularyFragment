@@ -29,7 +29,7 @@ public class WordProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = MainActivity2.mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = TestActivity.mDbHelper.getWritableDatabase();
 
         int count = 0;
         switch (uriMatcher.match(uri)){
@@ -65,7 +65,7 @@ public class WordProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         System.out.println(uri);
-        SQLiteDatabase db = MainActivity2.mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = TestActivity.mDbHelper.getWritableDatabase();
 
         long id = db.insert("words",null,values);
 
@@ -90,7 +90,7 @@ public class WordProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        SQLiteDatabase db = MainActivity2.mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = TestActivity.mDbHelper.getWritableDatabase();
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables("words");
@@ -109,7 +109,7 @@ public class WordProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        SQLiteDatabase db = MainActivity2.mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = TestActivity.mDbHelper.getWritableDatabase();
         int count = 0;
         switch (uriMatcher.match(uri)){
             case MULTIPLE_WORDS:
