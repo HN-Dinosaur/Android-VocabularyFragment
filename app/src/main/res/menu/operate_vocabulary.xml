@@ -10,5 +10,9 @@
         android:title="新增"
         android:id="@+id/add"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/toTest"
+        android:title="测试ContentProvide"
+        app:showAsAction="never"/>
 
 </menu>

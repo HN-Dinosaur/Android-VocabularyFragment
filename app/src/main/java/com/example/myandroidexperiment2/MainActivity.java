@@ -133,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.add:
                 insertDialog();
                 break;
+            case R.id.toTest:
+                startActivity(new Intent(MainActivity.this, TestActivity.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -21,12 +21,12 @@ public class TestActivity extends AppCompatActivity {
 
     private static final String TAG="MyWordsTag";
     private ContentResolver resolver;
-    Button all,delete,deleteAll,update,add,search,to;
+    Button all,delete,deleteAll,update,add,search,back;
     static WordDBHelper mDbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.TestActivity);
+        setContentView(R.layout.test_activity);
         mDbHelper = new WordDBHelper(this);
         resolver = this.getContentResolver();
 
@@ -38,9 +38,9 @@ public class TestActivity extends AppCompatActivity {
         update = findViewById(R.id.update);
         add = findViewById(R.id.add);
         search = findViewById(R.id.search);
-        to = findViewById(R.id.To);
+        back = findViewById(R.id.back);
 
-        to.setOnClickListener(new View.OnClickListener() {
+        back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(TestActivity.this,MainActivity.class);
